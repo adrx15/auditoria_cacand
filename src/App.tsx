@@ -1,4 +1,3 @@
-import React from 'react';
 import Resumen from './components/Resumen';
 import InyeccionSQL from './components/InyeccionSQL';
 import XSS from './components/XSS';
