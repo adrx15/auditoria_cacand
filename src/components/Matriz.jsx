@@ -1,86 +1,174 @@
-import React from 'react';
-
 export default function Matriz() {
-  // Datos de los activos y riesgos basados en la aerolínea AeroAustral
   const riesgos = [
-    { id: 'R1', name: 'Fuga de Pasaportes (SQLi)', p: 4, i: 5, score: 20, cat: 'Crítico', color: 'bg-red-600 text-white' },
-    { id: 'R3', name: 'Toma de Servidor (Cmd Inj)', p: 3, i: 5, score: 15, cat: 'Alto', color: 'bg-orange-500 text-white' },
-    { id: 'R2', name: 'Secuestro de Sesión (XSS)', p: 4, i: 3, score: 12, cat: 'Medio', color: 'bg-yellow-500 text-black' },
+    {
+      id: "R1",
+      name: "Fuga de Pasaportes (SQL Injection)",
+      probabilidad: 4,
+      impacto: 5,
+      severidad: "Crítico",
+    },
+    {
+      id: "R2",
+      name: "Secuestro de Sesión (XSS)",
+      probabilidad: 4,
+      impacto: 3,
+      severidad: "Alto",
+    },
+    {
+      id: "R3",
+      name: "Toma de Servidor (Command Injection)",
+      probabilidad: 3,
+      impacto: 5,
+      severidad: "Crítico",
+    },
   ];
 
+  const colorCelda = (valor) => {
+    if (valor >= 15) return "#dc2626";
+    if (valor >= 10) return "#f97316";
+    if (valor >= 5) return "#eab308";
+    return "#22c55e";
+  };
+
   return (
-    <div className="bg-slate-800 p-6 rounded-lg shadow-xl text-slate-100 space-y-6">
-      <h2 className="text-3xl font-extrabold text-blue-400">Matriz de Riesgo - AeroAustral</h2>
-      
-      {/* Tabla resumen de riesgos */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+    <section>
+      <h1>Matriz de Riesgo - AeroAustral</h1>
+
+      <p>
+        Mapa de calor basado en Probabilidad x Impacto. Mientras más alto sea
+        el valor, mayor es la criticidad del riesgo.
+      </p>
+
+      <div className="heatmap-container">
+        <table className="heatmap">
           <thead>
-            <tr className="border-b border-slate-600">
-              <th className="py-3 px-2">ID</th>
-              <th className="py-3 px-2">Riesgo</th>
-              <th className="py-3 px-2 text-center">Probabilidad</th>
-              <th className="py-3 px-2 text-center">Impacto</th>
-              <th className="py-3 px-2 text-center">Severidad</th>
+            <tr>
+              <th>Prob \\ Impacto</th>
+              {[1,2,3,4,5].map(i => <th key={i}>{i}</th>)}
             </tr>
           </thead>
+
           <tbody>
-            {riesgos.map(r => (
-              <tr key={r.id} className="border-b border-slate-700 hover:bg-slate-700 transition">
-                <td className="py-3 px-2 font-bold text-blue-300">{r.id}</td>
-                <td className="py-3 px-2">{r.name}</td>
-                <td className="py-3 px-2 text-center">{r.p}</td>
-                <td className="py-3 px-2 text-center">{r.i}</td>
-                <td className="py-3 px-2 text-center">
-                  <span className={`px-3 py-1 rounded text-xs font-bold ${r.color}`}>
-                    {r.score} - {r.cat}
-                  </span>
-                </td>
+            {[5,4,3,2,1].map(prob => (
+              <tr key={prob}>
+                <th>{prob}</th>
+
+                {[1,2,3,4,5].map(impacto => {
+                  const valor = prob * impacto;
+
+                  const encontrados = riesgos.filter(
+                    r =>
+                      r.probabilidad === prob &&
+                      r.impacto === impacto
+                  );
+
+                  return (
+                    <td
+                      key={impacto}
+                      style={{
+                        backgroundColor: colorCelda(valor)
+                      }}
+                    >
+                      <strong>{valor}</strong>
+
+                      {encontrados.map(r => (
+                        <div className="risk-tag" key={r.id}>
+                          {r.id}
+                          <br />
+                          {r.severidad}
+                        </div>
+                      ))}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Mapa de Calor Visual (Requisito de la evaluación) */}
-      <h3 className="text-xl font-bold text-blue-400 mt-8">Mapa de Calor Visual</h3>
-      <p className="text-sm text-slate-300 mb-4">Representación visual de Probabilidad x Impacto de los hallazgos técnicos.</p>
-      
-      <div className="grid grid-cols-6 gap-1 text-center text-sm">
-        {/* Cabecera del impacto */}
-        <div className="p-3 text-slate-400 font-bold border-b border-r border-slate-600">Prob \ Imp</div>
-        {[1, 2, 3, 4, 5].map(i => <div key={`header-${i}`} className="p-3 text-slate-400 font-bold border-b border-slate-600">{i}</div>)}
+      <div className="legend">
+        <span className="low">Bajo</span>
+        <span className="medium">Moderado</span>
+        <span className="high">Alto</span>
+        <span className="critical">Crítico</span>
+      </div>
 
-        {/* Generación de filas (Probabilidad) y celdas (Cálculo de calor) */}
-        {[5, 4, 3, 2, 1].map(p => (
-          <React.Fragment key={`row-${p}`}>
-            <div className="p-3 text-slate-400 font-bold flex items-center justify-center border-r border-slate-600">{p}</div>
-            {[1, 2, 3, 4, 5].map(i => {
-              const score = p * i;
-              
-              // Asignación de colores según la severidad
-              let bg = 'bg-green-600/80';
-              if (score >= 5 && score <= 9) bg = 'bg-yellow-500/80';
-              if (score >= 10 && score <= 14) bg = 'bg-orange-500/80';
-              if (score >= 15) bg = 'bg-red-600/80';
-              
-              // Filtra si algún riesgo de AeroAustral cae en esta celda exacta
-              const activosAqui = riesgos.filter(r => r.p === p && r.i === i);
-
-              return (
-                <div key={`cell-${p}-${i}`} className={`p-2 rounded-md min-h-[70px] flex flex-col items-center justify-center border border-slate-900 transition-transform hover:scale-105 ${bg}`}>
-                  <span className="opacity-60 text-white font-bold">{score}</span>
-                  {activosAqui.map(r => (
-                    <span key={r.id} className="mt-1 bg-slate-900 text-white px-2 py-0.5 rounded-full text-xs shadow-md">
-                      {r.id}
-                    </span>
-                  ))}
-                </div>
-              );
-            })}
-          </React.Fragment>
+      <div className="risk-list">
+        {riesgos.map(r => (
+          <article key={r.id}>
+            <h3>{r.id} - {r.name}</h3>
+            <p>
+              Probabilidad: {r.probabilidad} |
+              Impacto: {r.impacto} |
+              Nivel: {r.severidad}
+            </p>
+          </article>
         ))}
       </div>
-    </div>
+
+      <style>{`
+        .heatmap-container {
+          overflow-x: auto;
+          margin-top: 25px;
+        }
+
+        .heatmap {
+          border-collapse: collapse;
+          width: 100%;
+          text-align: center;
+        }
+
+        .heatmap th {
+          padding: 12px;
+          background: #1e293b;
+        }
+
+        .heatmap td {
+          height: 80px;
+          width: 80px;
+          border: 2px solid #0f172a;
+          color: white;
+          transition: transform .2s;
+        }
+
+        .heatmap td:hover {
+          transform: scale(1.08);
+        }
+
+        .risk-tag {
+          margin-top: 6px;
+          padding: 5px;
+          border-radius: 8px;
+          background: #020617;
+          font-size: 12px;
+        }
+
+        .legend {
+          display: flex;
+          gap: 12px;
+          margin-top: 20px;
+          flex-wrap: wrap;
+        }
+
+        .legend span {
+          padding: 8px 15px;
+          border-radius: 8px;
+          color: white;
+        }
+
+        .low { background:#22c55e; }
+        .medium { background:#eab308; }
+        .high { background:#f97316; }
+        .critical { background:#dc2626; }
+
+        .risk-list article {
+          margin-top: 15px;
+          padding: 15px;
+          background:#111827;
+          border-radius:12px;
+        }
+      `}</style>
+    </section>
   );
 }
