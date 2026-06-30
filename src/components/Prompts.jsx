@@ -1,0 +1,1 @@
+export default function Prompts(){return <div><h2>Bitácora de uso de IA</h2><div className="card"><p>Herramienta: ChatGPT</p><p>Uso: creación y revisión de componentes React, estructura visual y análisis de seguridad.</p><p>Validación humana: se revisó código generado, corregiendo rutas, estilos y lógica.</p></div></div>}
